@@ -1,0 +1,45 @@
+---
+name: build-s2i-python-kopf-publish
+on: push
+
+# Declare default permissions as read only.
+permissions: read-all
+
+jobs:
+  publish:
+    env:
+      CONTEXT_DIR: .
+      IMAGE_NAME: python-kopf-s2i
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get image tags
+        id: image_tags
+        uses: redhat-cop/github-actions/get-image-version@v4.5
+        with:
+          IMAGE_CONTEXT_DIR: ${{ env.CONTEXT_DIR }}
+
+      - name: Build image
+        id: build_image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          context: ${{ env.CONTEXT_DIR }}
+          dockerfiles: |
+            ./${{ env.CONTEXT_DIR }}/Dockerfile
+          image: ${{ env.IMAGE_NAME }}
+          tags: "${{ steps.image_tags.outputs.IMAGE_TAGS }}"
+
+      # - name: Push to Quay
+      #   env:
+      #     REGISTRY_URI: ${{ secrets.REGISTRY_URI }}
+      #   if: ${{ env.REGISTRY_URI  != '' && !contains(github.ref, 'renovate') }}
+      #   uses: redhat-actions/push-to-registry@v2
+      #   with:
+      #     image: ${{ steps.build_image.outputs.image }}
+      #     registry: ${{ secrets.REGISTRY_URI }}/${{ secrets.REGISTRY_REPOSITORY }}
+      #     username: ${{ secrets.REGISTRY_USERNAME }}
+      #     password: ${{ secrets.REGISTRY_PASSWORD }}
+      #     tags: ${{ steps.build_image.outputs.tags }}
