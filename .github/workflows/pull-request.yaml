@@ -29,7 +29,7 @@ jobs:
 
       - name: Update base image for kopf-simple Dockerfile
         run: |
-          sed -i -e "s/^FROM .*/FROM ${{ steps.image_tags.outputs.EXAMPLE_TAGS }}" ./examples/kopf-simple/Dockerfile
+          sed -i -e "s|^FROM .*|FROM ${{ steps.image_tags.outputs.EXAMPLE_TAGS }}|" ./examples/kopf-simple/Dockerfile
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
