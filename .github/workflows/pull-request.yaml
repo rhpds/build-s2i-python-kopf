@@ -1,0 +1,54 @@
+---
+name: pull-request
+on:
+  push:
+  # pull_request:
+  #   types: [opened, reopened]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Get image tags
+        id: image_tags
+        run: |
+          IMAGE_TAGS=(
+              "${{ vars.IMAGE_REGISTRY }}/${{ vars.IMAGE_REPOSITORY }}/${{ vars.IMAGE_NAME }}:latest"
+            )
+
+          EXAMPLE_TAGS=(
+              "${{ vars.IMAGE_REGISTRY }}/${{ vars.IMAGE_REPOSITORY }}/${{ vars.IMAGE_NAME }}-example:latest"
+            )
+
+          # Set IMAGE_TAGS output for use in next step
+          echo "IMAGE_TAGS=${IMAGE_TAGS[*]}" >> $GITHUB_OUTPUT
+          echo "EXAMPLE_TAGS=${EXAMPLE_TAGS[*]}" >> $GITHUB_OUTPUT
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        if: steps.image_tags.outputs.IMAGE_TAGS
+        with:
+          version: latest
+
+      - name: Build python-kopf image
+        if: steps.image_tags.outputs.IMAGE_TAGS
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: ${{ steps.image_tags.outputs.IMAGE_TAGS }}
+          cache-from: type=gha,scope=${{ vars.IMAGE_NAME }}
+          cache-to: type=gha,mode=max,scope=${{ vars.IMAGE_NAME }}
+
+      - name: Build python-kopf-example image
+        if: steps.image_tags.outputs.EXAMPLE_TAGS
+        uses: docker/build-push-action@v6
+        with:
+          context: ./examples/kopf-simple
+          push: false
+          tags: ${{ steps.image_tags.outputs.EXAMPLE_TAGS }}
+          cache-from: type=gha,scope=${{ vars.IMAGE_NAME }}
+          cache-to: type=gha,mode=max,scope=${{ vars.IMAGE_NAME }}
