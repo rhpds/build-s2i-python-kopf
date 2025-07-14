@@ -6,6 +6,13 @@ on:
       - '*'
     tags:
       - 'v[0-9]*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to be published (e.g., v1.38.0, v1.38.0-1)"
+        required: true
+        type: string
+        default: "latest"
 
 jobs:
   publish:
@@ -17,30 +24,49 @@ jobs:
       - name: Get image tags
         id: image_tags
         run: |
-          # Version is a semantic version tag or semantic version with release number
-          # GITHUB_REF will be of the form "refs/tags/v0.1.2" or "refs/tags/v0.1.2-1"
-          # To determine VERSION, strip off the leading "refs/tags/"
-          VERSION=${GITHUB_REF#refs/tags/}
+          if [[ -n "${{ github.event.inputs.version }}" ]]; then
+            # For workflow_dispatch, use only the version provided
+            VERSION=${{ github.event.inputs.version }}
+            RELEASE=${{ github.event.inputs.version }}
+            IMAGE_TAGS=(
+              "${{ vars.IMAGE_REGISTRY }}/${{ vars.IMAGE_REPOSITORY }}/${{ vars.IMAGE_NAME }}:${VERSION}"
+            )
+          else
+            # For tag events, use semantic versioning tags
+            # GITHUB_REF will be of the form "refs/tags/v0.1.2" or "refs/tags/v0.1.2-1"
+            # To determine VERSION, strip off the leading "refs/tags/"
+            VERSION=${GITHUB_REF#refs/tags/}
+            IMAGE_TAGS=(
+              "${{ vars.IMAGE_REGISTRY }}/${{ vars.IMAGE_REPOSITORY }}/${{ vars.IMAGE_NAME }}:latest"
+              "${{ vars.IMAGE_REGISTRY }}/${{ vars.IMAGE_REPOSITORY }}/${{ vars.IMAGE_NAME }}:${VERSION%.*}"
+              "${{ vars.IMAGE_REGISTRY }}/${{ vars.IMAGE_REPOSITORY }}/${{ vars.IMAGE_NAME }}:${VERSION}"
+            )
+          fi
 
-          echo "IMAGE_TAGS=latest ${VERSION%.*} ${VERSION}" >> $GITHUB_OUTPUT
+          # Set IMAGE_TAGS output for use in next step
+          echo "IMAGE_TAGS=${IMAGE_TAGS[*]}" >> $GITHUB_OUTPUT
 
-      - name: Buildah Action
-        id: buildah-build
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
         if: steps.image_tags.outputs.IMAGE_TAGS
-        uses: redhat-actions/buildah-build@v2
         with:
-          image: ${{ vars.IMAGE_NAME }}
-          tags: ${{ steps.image_tags.outputs.IMAGE_TAGS }}
-          dockerfiles: Dockerfile
-      
+          version: latest
 
-      - name: Push image to registry
-        id: push-to-registry
+      - name: Login to Image Registry
+        uses: docker/login-action@v3
         if: steps.image_tags.outputs.IMAGE_TAGS
-        uses: redhat-actions/push-to-registry@v2
         with:
-          image: ${{ steps.buildah-build.outputs.image }}
-          tags: ${{ steps.buildah-build.outputs.tags }}
           registry: ${{ vars.IMAGE_REGISTRY }}/${{ vars.IMAGE_REPOSITORY }}
           username: ${{ secrets.IMAGE_REGISTRY_USERNAME }}
           password: ${{ secrets.IMAGE_REGISTRY_PASSWORD }}
+
+      - name: Build and push
+        if: steps.image_tags.outputs.IMAGE_TAGS
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.image_tags.outputs.IMAGE_TAGS }}
+          cache-from: type=gha,scope=${{ vars.IMAGE_NAME }}
+          cache-to: type=gha,mode=max,scope=${{ vars.IMAGE_NAME }}
