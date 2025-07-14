@@ -38,7 +38,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: false
+          push: true
           tags: ${{ steps.image_tags.outputs.IMAGE_TAGS }}
           cache-from: type=gha,scope=${{ vars.IMAGE_NAME }}
           cache-to: type=gha,mode=max,scope=${{ vars.IMAGE_NAME }}
@@ -48,7 +48,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./examples/kopf-simple
-          push: false
+          push: true
           tags: ${{ steps.image_tags.outputs.EXAMPLE_TAGS }}
           cache-from: type=gha,scope=${{ vars.IMAGE_NAME }}
           cache-to: type=gha,mode=max,scope=${{ vars.IMAGE_NAME }}
