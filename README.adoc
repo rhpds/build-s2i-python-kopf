@@ -13,7 +13,7 @@ Unless Kopf standalone mode is used, peering between Kopf operators should be en
 The Kopf peering custom resource definitions are required for peering and can be installed with:
 
 --------------------------------------------------------------------------------
-oc apply -f https://raw.githubusercontent.com/redhat-cop/containers-quickstarts/master/build-s2i-python-kopf/peering-crds.yaml
+oc apply -f https://raw.githubusercontent.com/rhpds/python-kopf-s2i/refs/heads/main/peering-crds.yaml
 --------------------------------------------------------------------------------
 
 === Kopf Options
@@ -158,7 +158,7 @@ xref:examples/kopf-simple/README.adoc[Simple Example].
 ==== Dockerfile
 
 This example image may also be built with the provided `Dockerfile`.
-The provided configuration builds from the base image `quay.io/redhat-cop/python-kopf-s2i:latest`.
+The provided configuration builds from the base image `quay.io/rhpds/python-kopf-s2i:latest`.
 In order to test your build of the s2i image you will need a modified version of the `Dockerfile`:
 
 --------------------------------------------------------------------------------

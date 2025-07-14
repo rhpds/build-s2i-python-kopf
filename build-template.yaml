@@ -10,7 +10,7 @@ parameters:
 - name: FROM_IMAGE
   value: registry.access.redhat.com/ubi9/python-312:latest
 - name: GIT_REPO
-  value: https://github.com/redhat-cop/containers-quickstarts.git
+  value: https://github.com/rhpds/python-kopf-s2i.git
 - name: NAME
   value: python-kopf-s2i
 
@@ -38,8 +38,7 @@ objects:
     source:
       git:
         uri: ${GIT_REPO}
-        ref: master
-      contextDir: build-s2i-python-kopf
+        ref: main
     strategy:
       type: Docker
       dockerStrategy:

@@ -8,9 +8,9 @@ metadata:
 
 parameters:
 - name: FROM_IMAGE
-  value: quay.io/redhat-cop/python-kopf-s2i:latest
+  value: quay.io/rhpds/python-kopf-s2i:latest
 - name: GIT_REPO
-  value: https://github.com/redhat-cop/containers-quickstarts.git
+  value: https://github.com/rhpds/python-kopf-s2i.git
 - name: NAME
   value: openshift-template-deployer
 
@@ -38,8 +38,8 @@ objects:
     source:
       git:
         uri: ${GIT_REPO}
-        ref: master
-      contextDir: build-s2i-python-kopf/examples/openshift-template-deployer
+        ref: main
+      contextDir: examples/openshift-template-deployer
     strategy:
       sourceStrategy:
         from:

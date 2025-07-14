@@ -13,9 +13,8 @@ spec:
   runPolicy: Serial
   source:
     git:
-      uri: https://github.com/redhat-cop/containers-quickstarts.git
-      ref: master
-    contextDir: build-s2i-python-kopf
+      uri: https://github.com/rhpds/python-kopf-s2i.git
+      ref: main
   strategy:
     type: Docker
     dockerStrategy:

@@ -12,19 +12,18 @@ spec:
   tags:
   - annotations:
       description: |-
-        Build and run operators with Python Kopf 1.37.
+        Build and run operators with Python Kopf 1.38.
         https://kopf.readthedocs.io/
       iconClass: icon-python
       openshift.io/display-name: Python Kopf
-      sampleRepo: https://github.com/redhat-cop/build-s2i-python-kopf/example.git
-      supports: kopf:1.37,kopf,python:3.8,python
+      supports: kopf,python
       tags: builder,python,kopf
-      version: "1.37"
+      version: "1.38"
     from:
       kind: DockerImage
-      name: quay.io/redhat-cop/python-kopf-s2i:v1.37
+      name: quay.io/rhpds/python-kopf-s2i:v1.38
     importPolicy: {}
-    name: "1.37"
+    name: "1.38"
     referencePolicy:
       type: Local
   - annotations:
@@ -35,12 +34,11 @@ spec:
         WARNING: By selecting this tag, your application will automatically update to use the latest version of Python Kopf available, including major version updates.
       iconClass: icon-python
       openshift.io/display-name: Python Kopf
-      sampleRepo: https://github.com/redhat-cop/build-s2i-python-kopf/example.git
       supports: kopf,python
       tags: builder,python,kopf
     from:
       kind: DockerImage
-      name: quay.io/redhat-cop/python-kopf-s2i:latest
+      name: quay.io/rhpds/python-kopf-s2i:latest
     importPolicy: {}
     name: latest
     referencePolicy:
