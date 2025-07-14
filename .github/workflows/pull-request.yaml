@@ -40,6 +40,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
         if: steps.image_tags.outputs.IMAGE_TAGS
         with:
+          driver-opts: network=host
           version: latest
 
       - name: Build python-kopf image
