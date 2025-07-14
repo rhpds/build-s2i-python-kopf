@@ -63,7 +63,6 @@ jobs:
           cache-from: type=gha,scope=${{ vars.IMAGE_NAME }}
           cache-to: type=gha,mode=max,scope=${{ vars.IMAGE_NAME }}
 
-      - name: Run simple "smoke" test
+      - name: Inspect
         run: |
-          echo "Checking kopf version..."
-          echo "$(podman run --entrypoint '/bin/sh' ${{ steps.image_tags.outputs.EXAMPLE_TAGS }} -c 'kopf --version')"
+          docker buildx imagetools inspect ${{ steps.image_tags.outputs.EXAMPLE_TAGS }}
