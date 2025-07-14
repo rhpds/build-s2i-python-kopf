@@ -44,7 +44,7 @@ jobs:
           fi
 
           # Set IMAGE_TAGS output for use in next step
-          echo "IMAGE_TAGS=${IMAGE_TAGS[*]}" >> $GITHUB_OUTPUT
+          ( IFS=$','; echo "IMAGE_TAGS=${IMAGE_TAGS[*]}" >> $GITHUB_OUTPUT )
 
 
       - name: Set up Docker Buildx
