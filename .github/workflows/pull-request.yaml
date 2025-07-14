@@ -16,11 +16,11 @@ jobs:
         id: image_tags
         run: |
           IMAGE_TAGS=(
-              "localhost/${{ vars.IMAGE_REPOSITORY }}/${{ vars.IMAGE_NAME }}:latest"
+              "localhost/${{ vars.IMAGE_NAME }}:latest"
             )
 
           EXAMPLE_TAGS=(
-              "localhost/${{ vars.IMAGE_REPOSITORY }}/${{ vars.IMAGE_NAME }}-example:latest"
+              "localhost/${{ vars.IMAGE_NAME }}-example:latest"
             )
 
           # Set IMAGE_TAGS output for use in next step
